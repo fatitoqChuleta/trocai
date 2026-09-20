@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trocaí</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="cabecalho">
+        <div class="container">
+            <h1>Trocaí</h1>
+            <p>Slogan.</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="card formulario-card">
+            <h2>Novo Cadastro</h2>
+
+            <form id="cadastroForm">
+
+                <div class="campo">
+                    <label for="nome">Nome</label>
+                    <input 
+                        type="text" 
+                        id="nome" 
+                        placeholder="Digite seu nome"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="item">Item</label>
+                    <input 
+                        type="text" 
+                        id="item" 
+                        placeholder="Digite o item"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Cadastrar
+                </button>
+
+            </form>
+        </section>
+
+        <section class="cadastros">
+            <div class="titulo-secao">
+                <h2>Cadastros realizados</h2>
+                <span id="contador">0 cadastros</span>
+            </div>
+
+            <div id="listaCadastros" class="lista-cadastros">
+                <!-- Os cadastros serão adicionados aqui -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Projeto de cadastro</p>
+    </footer>
+
+    <script>
+        const formulario = document.getElementById("cadastroForm");
+        const nomeInput = document.getElementById("nome");
+        const itemInput = document.getElementById("item");
+        const listaCadastros = document.getElementById("listaCadastros");
+        const contador = document.getElementById("contador");
+
+        let cadastros = JSON.parse(localStorage.getItem("cadastros")) || [];
+
+        function atualizarLista() {
+            listaCadastros.innerHTML = "";
+
+            if (cadastros.length === 0) {
+                listaCadastros.innerHTML = `
+                    <div class="vazio">
+                        <p>Nenhum cadastro realizado ainda.</p>
+                    </div>
+                `;
+            }
+
+            cadastros.forEach((cadastro, index) => {
+
+                const card = document.createElement("div");
+                card.classList.add("cadastro");
+
+                card.innerHTML = `
+                    <div class="informacao">
+                        <span class="rotulo">Nome</span>
+                        <strong>${cadastro.nome}</strong>
+                    </div>
+
+                    <div class="informacao">
+                        <span class="rotulo">Item</span>
+                        <strong>${cadastro.item}</strong>
+                    </div>
+
+                    <button 
+                        class="botao-excluir" 
+                        onclick="excluirCadastro(${index})"
+                    >
+                        Excluir
+                    </button>
+                `;
+
+                listaCadastros.appendChild(card);
+            });
+
+            contador.textContent =
+                cadastros.length === 1
+                    ? "1 cadastro"
+                    : `${cadastros.length} cadastros`;
+        }
+
+        formulario.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const nome = nomeInput.value.trim();
+            const item = itemInput.value.trim();
+
+            if (nome === "" || item === "") {
+                return;
+            }
+
+            const novoCadastro = {
+                nome: nome,
+                item: item
+            };
+
+            cadastros.push(novoCadastro);
+
+            localStorage.setItem(
+                "cadastros",
+                JSON.stringify(cadastros)
+            );
+
+            formulario.reset();
+
+            atualizarLista();
+        });
+
+        function excluirCadastro(index) {
+            cadastros.splice(index, 1);
+
+            localStorage.setItem(
+                "cadastros",
+                JSON.stringify(cadastros)
+            );
+
+            atualizarLista();
+        }
+
+        atualizarLista();
+    </script>
+
+</body>
+</html>
